@@ -15,12 +15,11 @@
 <body>
 <div class="card">
   <div style="font-size:14px;font-weight:700;color:#b8c5dc;margin-bottom:10px;text-align:center;">
-    Jin&#39;s Portfolio 누적 수익률 <span style="color:#6b7280;font-size:11px;font-weight:400;">(각 변동일 종가 기준 포지션 가중)</span>
+    Jin&#39;s Portfolio 누적 수익금
+    <span style="color:#6b7280;font-size:11px;font-weight:400;">(원금 1,000만원 기준)</span>
   </div>
   <div style="position:relative;height:480px;"><canvas id="returnChart"></canvas></div>
-  <div style="text-align:center;color:#6b7280;font-size:11px;margin-top:6px;" id="returnNote">
-    💡 기준가 = 거래일 시가×0.5 + 종가×0.5
-  </div>
+  <div style="text-align:center;font-size:11px;margin-top:8px;" id="returnNote"></div>
 </div>
 <div id="err"></div>
 <script>
@@ -28,6 +27,8 @@ document.addEventListener('DOMContentLoaded', function() {
   try {
     if (typeof Chart === 'undefined') throw new Error('Chart.js 로드 실패');
     if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
+
+    const BASE = 1000; // 만원
 
     const returnEvents = [
       { date:"3/10", totalReturn:-1.49, krReturn:-2.42, usReturn:0.38 },
@@ -59,58 +60,99 @@ document.addEventListener('DOMContentLoaded', function() {
       { date:"4/23", totalReturn:15.84, krReturn:20.52, usReturn:10.88 }
     ];
 
+    // % → 만원 변환
+    const toMan = pct => Math.round(BASE * pct) / 100;
+
+    const totalProfit  = returnEvents.map(e => toMan(e.totalReturn));
+    const krProfit     = returnEvents.map(e => toMan(e.krReturn));
+    const usProfit     = returnEvents.map(e => toMan(e.usReturn));
+
+    const last = returnEvents[returnEvents.length - 1];
+    const lastTotal = toMan(last.totalReturn);
+    const lastKr    = toMan(last.krReturn);
+    const lastUs    = toMan(last.usReturn);
+
     new Chart(document.getElementById('returnChart').getContext('2d'), {
-      type:'line',
-      data:{
-        labels: returnEvents.map(e=>e.date),
-        datasets:[
-          { label:'총 수익률',
-            data:returnEvents.map(e=>e.totalReturn),
-            borderColor:'#fbbf24', backgroundColor:'rgba(251,191,36,0.15)',
-            borderWidth:3, pointRadius:4, pointHoverRadius:7,
-            pointBackgroundColor:'#fbbf24', pointBorderColor:'#0f1a2e', pointBorderWidth:2,
-            fill:true, tension:0.3, order:3 },
-          { label:'🇰🇷 한국',
-            data:returnEvents.map(e=>e.krReturn),
-            borderColor:'#e57373', backgroundColor:'transparent',
-            borderWidth:2, pointRadius:2.5, pointHoverRadius:5, tension:0.3, order:2 },
-          { label:'🇺🇲 미국',
-            data:returnEvents.map(e=>e.usReturn),
-            borderColor:'#7cc88a', backgroundColor:'transparent',
-            borderWidth:2, pointRadius:2.5, pointHoverRadius:5, tension:0.3, order:1 }
+      type: 'line',
+      data: {
+        labels: returnEvents.map(e => e.date),
+        datasets: [
+          {
+            label: '총 수익금',
+            data: totalProfit,
+            borderColor: '#fbbf24',
+            backgroundColor: 'rgba(251,191,36,0.12)',
+            borderWidth: 3,
+            pointRadius: 4, pointHoverRadius: 7,
+            pointBackgroundColor: '#fbbf24',
+            pointBorderColor: '#0f1a2e', pointBorderWidth: 2,
+            fill: true, tension: 0.3, order: 3
+          },
+          {
+            label: '🇰🇷 한국',
+            data: krProfit,
+            borderColor: '#e57373', backgroundColor: 'transparent',
+            borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
+            tension: 0.3, order: 2
+          },
+          {
+            label: '🇺🇲 미국',
+            data: usProfit,
+            borderColor: '#7cc88a', backgroundColor: 'transparent',
+            borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
+            tension: 0.3, order: 1
+          }
         ]
       },
-      options:{
-        responsive:true, maintainAspectRatio:false,
-        layout:{ padding:{ top:28, right:20, left:6, bottom:6 } },
-        plugins:{
-          legend:{ display:true, position:'bottom',
-            labels:{ color:'#b8c5dc', font:{size:11}, boxWidth:14, boxHeight:8 } },
-          datalabels:{
-            display: ctx => ctx.datasetIndex===0 && ctx.dataIndex===ctx.dataset.data.length-1,
-            color:'#fbbf24', anchor:'end', align:'top', offset:6,
-            font:{ size:12, weight:'700' },
-            formatter: v => (v!=null ? ((v>=0?'+':'')+v.toFixed(2)+'%') : '—')
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        layout: { padding: { top: 36, right: 20, left: 6, bottom: 6 } },
+        plugins: {
+          legend: {
+            display: true, position: 'bottom',
+            labels: { color: '#b8c5dc', font: { size: 11 }, boxWidth: 14, boxHeight: 8 }
           },
-          tooltip:{
-            backgroundColor:'#0b1424', titleColor:'#fbbf24', bodyColor:'#e4e7ef',
-            callbacks:{ label: c => '  '+c.dataset.label+': '+(c.raw!=null?(c.raw>=0?'+':'')+c.raw.toFixed(2)+'%':'—') }
+          datalabels: {
+            display: ctx => ctx.datasetIndex === 0 && ctx.dataIndex === ctx.dataset.data.length - 1,
+            color: '#fbbf24', anchor: 'end', align: 'top', offset: 6,
+            font: { size: 13, weight: '700' },
+            formatter: v => (v >= 0 ? '+' : '') + v.toFixed(0) + '만'
+          },
+          tooltip: {
+            backgroundColor: '#0b1424', titleColor: '#fbbf24', bodyColor: '#e4e7ef',
+            callbacks: {
+              label: c => {
+                const v = c.raw;
+                const sign = v >= 0 ? '+' : '';
+                const pct = returnEvents[c.dataIndex];
+                const pctField = c.datasetIndex === 0 ? 'totalReturn' : c.datasetIndex === 1 ? 'krReturn' : 'usReturn';
+                return '  ' + c.dataset.label + ': ' + sign + v.toFixed(1) + '만원  (' + sign + pct[pctField].toFixed(2) + '%)';
+              }
+            }
           }
         },
-        scales:{
-          x:{ ticks:{ color:'#6b7280', font:{size:9}, maxRotation:45 }, grid:{ color:'#1e2a44' } },
-          y:{ ticks:{ color:'#6b7280', callback:v=>(v>=0?'+':'')+v+'%' }, grid:{ color:'#1e2a44' } }
+        scales: {
+          x: { ticks: { color: '#6b7280', font: { size: 9 }, maxRotation: 45 }, grid: { color: '#1e2a44' } },
+          y: {
+            ticks: {
+              color: '#6b7280',
+              callback: v => (v >= 0 ? '+' : '') + v + '만'
+            },
+            grid: { color: '#1e2a44' }
+          }
         }
       }
     });
 
-    const last = returnEvents[returnEvents.length-1];
+    const col = lastTotal >= 0 ? '#fbbf24' : '#f87171';
+    const sign = v => (v >= 0 ? '+' : '');
     document.getElementById('returnNote').innerHTML =
-      '💡 기준가 = 거래일 시가×0.5 + 종가×0.5  ·  ' +
-      '<b style="color:#fbbf24">전체 '+(last.totalReturn>=0?'+':'')+last.totalReturn.toFixed(2)+'%</b>  ·  ' +
-      '<b style="color:#e57373">🇰🇷 '+(last.krReturn>=0?'+':'')+last.krReturn.toFixed(2)+'%</b>  ·  ' +
-      '<b style="color:#7cc88a">🇺🇲 '+(last.usReturn>=0?'+':'')+last.usReturn.toFixed(2)+'%</b>  ·  ' +
-      '<span style="color:#6b7280">기준일: '+last.date+' (4/23 이후 업데이트 필요)</span>';
+      '원금 1,000만원 기준  ·  ' +
+      '<b style="color:' + col + '">총 ' + sign(lastTotal) + lastTotal.toFixed(0) + '만원 (' + sign(last.totalReturn) + last.totalReturn.toFixed(2) + '%)</b>  ·  ' +
+      '<b style="color:#e57373">🇰🇷 ' + sign(lastKr) + lastKr.toFixed(0) + '만</b>  ·  ' +
+      '<b style="color:#7cc88a">🇺🇲 ' + sign(lastUs) + lastUs.toFixed(0) + '만</b>  ·  ' +
+      '<span style="color:#4b5563">기준일 ' + last.date + ' · 4/24 이후 업데이트 필요</span>';
+
   } catch(e) {
     document.getElementById('err').innerHTML = '<div class="err">⚠️ 오류: ' + e.message + '</div>';
     console.error(e);
