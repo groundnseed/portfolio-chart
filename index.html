@@ -1244,7 +1244,7 @@ document.addEventListener('DOMContentLoaded', function() {
           ]},
           options:{
             responsive:true,maintainAspectRatio:false,animation:false,
-            plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,
+            plugins:{datalabels:{display:false},legend:{display:false},tooltip:{mode:'index',intersect:false,
               backgroundColor:'#0b1424',titleColor:'#fbbf24',bodyColor:'#e4e7ef',
               callbacks:{label:c=>{
                 if(c.datasetIndex===0)return '주가 '+(c.raw?.toLocaleString()||'');
