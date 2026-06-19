@@ -28,76 +28,104 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof Chart === 'undefined') throw new Error('Chart.js 로드 실패');
     if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
 
-    const BASE = 1000; // 만원
-
-    const returnEvents = [
-      { date:"3/10", totalReturn:-1.49, krReturn:-2.42, usReturn:0.38 },
-      { date:"3/17", totalReturn:-0.43, krReturn:0.01,  usReturn:-1.76 },
-      { date:"3/19", totalReturn:4.98,  krReturn:5.46,  usReturn:3.46 },
-      { date:"3/20", totalReturn:3.67,  krReturn:5.63,  usReturn:-1.86 },
-      { date:"3/22", totalReturn:-1.55, krReturn:-2.06, usReturn:-0.09 },
-      { date:"3/23", totalReturn:-1.13, krReturn:-1.68, usReturn:-0.09 },
-      { date:"3/25", totalReturn:1.94,  krReturn:0.74,  usReturn:4.22 },
-      { date:"3/26", totalReturn:-1.42, krReturn:0.26,  usReturn:-4.32 },
-      { date:"3/27", totalReturn:-3.26, krReturn:-2.35, usReturn:-4.49 },
-      { date:"3/29", totalReturn:-5.01, krReturn:-2.1,  usReturn:-9.51 },
-      { date:"3/31", totalReturn:-4.13, krReturn:-5.43, usReturn:-1.6 },
-      { date:"4/3",  totalReturn:4.58,  krReturn:5.67,  usReturn:3.17 },
-      { date:"4/5",  totalReturn:3.27,  krReturn:3.33,  usReturn:3.17 },
-      { date:"4/7",  totalReturn:2.91,  krReturn:0.26,  usReturn:6.04 },
-      { date:"4/8",  totalReturn:8.67,  krReturn:4.13,  usReturn:16.6 },
-      { date:"4/9",  totalReturn:7.89,  krReturn:3.2,   usReturn:13.1 },
-      { date:"4/10", totalReturn:8.62,  krReturn:5.02,  usReturn:12.29 },
-      { date:"4/12", totalReturn:8.55,  krReturn:3.74,  usReturn:12.94 },
-      { date:"4/13", totalReturn:8.23,  krReturn:3.25,  usReturn:12.94 },
-      { date:"4/14", totalReturn:8.16,  krReturn:4.75,  usReturn:11.32 },
-      { date:"4/15", totalReturn:8.89,  krReturn:8.72,  usReturn:9.04 },
-      { date:"4/16", totalReturn:13.42, krReturn:15.73, usReturn:11.08 },
-      { date:"4/17", totalReturn:12.92, krReturn:13.5,  usReturn:12.34 },
-      { date:"4/19", totalReturn:11.92, krReturn:13.38, usReturn:10.56 },
-      { date:"4/21", totalReturn:13.3,  krReturn:17.21, usReturn:9.24 },
-      { date:"4/22", totalReturn:14.98, krReturn:18.85, usReturn:10.88 },
-      { date:"4/23", totalReturn:15.84, krReturn:20.52, usReturn:10.88 }
+    // 노션 "💰 1억 투자 수익금 추이" DB에서 가져온 실제 데이터
+    // 1억 기준 → 1천만원 기준으로 /10 환산
+    const SCALE = 0.1;
+    const raw = [
+      { date:'3/10', total:-557, kr:-407, us:-149, note:'봄학기 첫 편입 (총 30%)' },
+      { date:'3/13', total:-563, kr:-401, us:-162, note:'' },
+      { date:'3/17', total:-392, kr:-288, us:-104, note:'' },
+      { date:'3/19', total:-185, kr:-158, us:-27,  note:'' },
+      { date:'3/24', total:-397, kr:-345, us:-51,  note:'' },
+      { date:'3/26', total:-496, kr:-353, us:-143, note:'' },
+      { date:'3/27', total:-501, kr:-362, us:-139, note:'금리 급등 + AI H/W 충격 → 트리밍' },
+      { date:'4/2',  total:-527, kr:-492, us:-35,  note:'' },
+      { date:'4/3',  total:-377, kr:-377, us:0,    note:'' },
+      { date:'4/6',  total:-387, kr:-349, us:-39,  note:'' },
+      { date:'4/8',  total:-51,  kr:-116, us:65,   note:'🎉 휴전선언, 한국 13% 증액' },
+      { date:'4/9',  total:-62,  kr:-173, us:112,  note:'' },
+      { date:'4/14', total:142,  kr:-17,  us:158,  note:'LIVE 6 대쪽증액' },
+      { date:'4/15', total:239,  kr:105,  us:134,  note:'' },
+      { date:'4/16', total:433,  kr:265,  us:169,  note:'' },
+      { date:'4/17', total:433,  kr:246,  us:187,  note:'' },
+      { date:'4/21', total:557,  kr:408,  us:149,  note:'미세조정 시작 (85% 도달)' },
+      { date:'4/28', total:881,  kr:677,  us:204,  note:'' },
+      { date:'5/1',  total:364,  kr:0,    us:364,  note:'' },
+      { date:'5/15', total:1817, kr:1288, us:529,  note:'' },
+      { date:'5/19', total:1606, kr:1104, us:502,  note:'' },
+      { date:'5/29', total:3258, kr:2591, us:667,  note:'' },
+      { date:'6/1',  total:3379, kr:2684, us:696,  note:'최고점' },
+      { date:'6/3',  total:806,  kr:0,    us:806,  note:'' },
+      { date:'6/4',  total:3099, kr:2319, us:780,  note:'' },
+      { date:'6/9',  total:2851, kr:2181, us:670,  note:'' },
+      { date:'6/11', total:2744, kr:1903, us:841,  note:'BE 편출' },
     ];
 
-    // % → 만원 변환
-    const toMan = pct => Math.round(BASE * pct) / 100;
+    const events = raw.map(d => ({
+      date: d.date,
+      total: Math.round(d.total * SCALE * 10) / 10,
+      kr:    Math.round(d.kr    * SCALE * 10) / 10,
+      us:    Math.round(d.us    * SCALE * 10) / 10,
+      note:  d.note
+    }));
 
-    const totalProfit  = returnEvents.map(e => toMan(e.totalReturn));
-    const krProfit     = returnEvents.map(e => toMan(e.krReturn));
-    const usProfit     = returnEvents.map(e => toMan(e.usReturn));
+    const last = events[events.length - 1];
+    const peak = events.reduce((m, e) => e.total > m.total ? e : m, events[0]);
 
-    const last = returnEvents[returnEvents.length - 1];
-    const lastTotal = toMan(last.totalReturn);
-    const lastKr    = toMan(last.krReturn);
-    const lastUs    = toMan(last.usReturn);
+    // callout 표시용 플러그인
+    const notePlugin = {
+      id: 'notePlugin',
+      afterDatasetsDraw(chart) {
+        const ctx = chart.ctx;
+        const meta = chart.getDatasetMeta(0);
+        if (!meta?.data?.length) return;
+        events.forEach((e, i) => {
+          if (!e.note) return;
+          const p = meta.data[i];
+          if (!p) return;
+          const lines = e.note.split(' ');
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 5, 0, Math.PI*2);
+          ctx.fillStyle = '#fbbf24'; ctx.fill();
+          ctx.strokeStyle = '#0b1424'; ctx.lineWidth = 1.5; ctx.stroke();
+          const bx = p.x, by = p.y - 48;
+          ctx.font = 'bold 9.5px system-ui'; ctx.textAlign = 'center';
+          lines.forEach((line, j) => {
+            const y = by + j * 12;
+            ctx.strokeStyle = 'rgba(11,20,36,0.9)'; ctx.lineWidth = 3;
+            ctx.strokeText(line, bx, y);
+            ctx.fillStyle = j === 0 ? '#fbbf24' : '#e4e7ef';
+            ctx.fillText(line, bx, y);
+          });
+          ctx.restore();
+        });
+      }
+    };
 
     new Chart(document.getElementById('returnChart').getContext('2d'), {
       type: 'line',
       data: {
-        labels: returnEvents.map(e => e.date),
+        labels: events.map(e => e.date),
         datasets: [
           {
             label: '총 수익금',
-            data: totalProfit,
-            borderColor: '#fbbf24',
-            backgroundColor: 'rgba(251,191,36,0.12)',
-            borderWidth: 3,
-            pointRadius: 4, pointHoverRadius: 7,
-            pointBackgroundColor: '#fbbf24',
-            pointBorderColor: '#0f1a2e', pointBorderWidth: 2,
+            data: events.map(e => e.total),
+            borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.12)',
+            borderWidth: 3, pointRadius: 4, pointHoverRadius: 7,
+            pointBackgroundColor: '#fbbf24', pointBorderColor: '#0f1a2e', pointBorderWidth: 2,
             fill: true, tension: 0.3, order: 3
           },
           {
             label: '🇰🇷 한국',
-            data: krProfit,
+            data: events.map(e => e.kr),
             borderColor: '#e57373', backgroundColor: 'transparent',
             borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
             tension: 0.3, order: 2
           },
           {
             label: '🇺🇲 미국',
-            data: usProfit,
+            data: events.map(e => e.us),
             borderColor: '#7cc88a', backgroundColor: 'transparent',
             borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
             tension: 0.3, order: 1
@@ -106,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       options: {
         responsive: true, maintainAspectRatio: false,
-        layout: { padding: { top: 36, right: 20, left: 6, bottom: 6 } },
+        layout: { padding: { top: 60, right: 20, left: 6, bottom: 6 } },
         plugins: {
           legend: {
             display: true, position: 'bottom',
@@ -123,10 +151,12 @@ document.addEventListener('DOMContentLoaded', function() {
             callbacks: {
               label: c => {
                 const v = c.raw;
-                const sign = v >= 0 ? '+' : '';
-                const pct = returnEvents[c.dataIndex];
-                const pctField = c.datasetIndex === 0 ? 'totalReturn' : c.datasetIndex === 1 ? 'krReturn' : 'usReturn';
-                return '  ' + c.dataset.label + ': ' + sign + v.toFixed(1) + '만원  (' + sign + pct[pctField].toFixed(2) + '%)';
+                const s = v >= 0 ? '+' : '';
+                return '  ' + c.dataset.label + ': ' + s + v.toFixed(1) + '만원';
+              },
+              afterBody: items => {
+                const note = events[items[0].dataIndex]?.note;
+                return note ? ['', '📌 ' + note] : [];
               }
             }
           }
@@ -134,24 +164,22 @@ document.addEventListener('DOMContentLoaded', function() {
         scales: {
           x: { ticks: { color: '#6b7280', font: { size: 9 }, maxRotation: 45 }, grid: { color: '#1e2a44' } },
           y: {
-            ticks: {
-              color: '#6b7280',
-              callback: v => (v >= 0 ? '+' : '') + v + '만'
-            },
+            ticks: { color: '#6b7280', callback: v => (v >= 0 ? '+' : '') + v + '만' },
             grid: { color: '#1e2a44' }
           }
         }
-      }
+      },
+      plugins: [notePlugin]
     });
 
-    const col = lastTotal >= 0 ? '#fbbf24' : '#f87171';
-    const sign = v => (v >= 0 ? '+' : '');
+    const sign = v => v >= 0 ? '+' : '';
+    const col = last.total >= 0 ? '#fbbf24' : '#f87171';
     document.getElementById('returnNote').innerHTML =
       '원금 1,000만원 기준  ·  ' +
-      '<b style="color:' + col + '">총 ' + sign(lastTotal) + lastTotal.toFixed(0) + '만원 (' + sign(last.totalReturn) + last.totalReturn.toFixed(2) + '%)</b>  ·  ' +
-      '<b style="color:#e57373">🇰🇷 ' + sign(lastKr) + lastKr.toFixed(0) + '만</b>  ·  ' +
-      '<b style="color:#7cc88a">🇺🇲 ' + sign(lastUs) + lastUs.toFixed(0) + '만</b>  ·  ' +
-      '<span style="color:#4b5563">기준일 ' + last.date + ' · 4/24 이후 업데이트 필요</span>';
+      '최신 <b style="color:' + col + '">' + sign(last.total) + last.total.toFixed(0) + '만원</b>  (' + last.date + ')  ·  ' +
+      '<b style="color:#e57373">🇰🇷 ' + sign(last.kr) + last.kr.toFixed(0) + '만</b>  ·  ' +
+      '<b style="color:#7cc88a">🇺🇲 ' + sign(last.us) + last.us.toFixed(0) + '만</b>  ·  ' +
+      '<span style="color:#6b7280">최고점: ' + peak.date + ' +' + peak.total.toFixed(0) + '만</span>';
 
   } catch(e) {
     document.getElementById('err').innerHTML = '<div class="err">⚠️ 오류: ' + e.message + '</div>';
