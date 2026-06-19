@@ -44,7 +44,12 @@ document.addEventListener('DOMContentLoaded', function() {
       { name:'BE',    market:'us', pct:2.0, today:true, delta:2, change:'0→2 재편입', sector:'연료전지', note:'재랠리 전환, AI 인프라 확장' },
       { name:'CSCO',  market:'us', pct:2.0 }
     ];
-    const EXTENDED_PORT = ['피에스케이', '삼성중공업', 'GEV', 'VRT'];
+    const EXTENDED_PORT = [
+      { name:'피에스케이', date:'6/14' },
+      { name:'삼성중공업', date:'4/27' },
+      { name:'GEV',       date:'4/27' },
+      { name:'VRT',       date:'5/29' },
+    ];
     const latestDate = '6/19';
     const kr = holdings.filter(h=>h.market==='kr').sort((a,b)=>b.pct-a.pct);
     const us = holdings.filter(h=>h.market==='us').sort((a,b)=>b.pct-a.pct);
@@ -101,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
       (EXTENDED_PORT.length ?
         '<div style="margin-top:14px;padding:10px 14px;border:1px solid #fbbf24;border-radius:8px;display:inline-block;">' +
           '<span style="font-size:11.5px;color:#fbbf24;font-weight:600;">확장포트 (비중 미관리):</span>' +
-          '<span style="font-size:11.5px;color:#94a3b8;margin-left:6px;">'+EXTENDED_PORT.join(' · ')+'</span>' +
+          '<span style="font-size:11.5px;color:#94a3b8;margin-left:6px;">'+EXTENDED_PORT.map(e=>e.name+'<span style="color:#4b5563;font-size:10px;margin-left:3px;">('+e.date+')</span>').join(' · ')+'</span>' +
         '</div>' : '');
   } catch(e) {
     document.getElementById('err').innerHTML = '<div class="err">⚠️ 오류: ' + e.message + '</div>';
