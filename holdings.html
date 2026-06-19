@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Noto Sans KR','Malgun Gothic',sans-serif; background:#0b1220; color:#e4e7ef; padding:14px; }
+  .card { background:#111a2d; border:1px solid #1e2a44; border-radius:14px; padding:16px 18px 20px; }
+  .card-title { font-size:14px; font-weight:700; color:#b8c5dc; margin-bottom:10px; text-align:center; }
+  .err { background:#3b1d24; color:#ff9b9b; padding:12px; border-radius:8px; font-size:13px; margin-top:8px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div id="holdingsInner"></div>
+</div>
+<div id="err"></div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    const holdings = [
+      { name:'삼성전기',  market:'kr', pct:12.0, today:true, delta:6,  change:'6→12',  sector:'한국·IT부품', note:'동일(편입비중 재표기)' },
+      { name:'KODEX200', market:'kr', pct:12.0 },
+      { name:'SK하이닉스',market:'kr', pct:9.0,  today:true, delta:2.5,change:'6.5→9', sector:'한국·반도체',  note:'수량복원 매입단가 상승 → 편입비중 재표기' },
+      { name:'삼성전자',  market:'kr', pct:8.0,  today:true, delta:1,  change:'7→8',   sector:'한국·반도체',  note:'6/18 삼성액' },
+      { name:'KB금융',   market:'kr', pct:4.0 },
+      { name:'현대차',    market:'kr', pct:3.0 },
+      { name:'OCI홀딩스', market:'kr', pct:2.0 },
+      { name:'LS Electric',market:'kr',pct:2.0 },
+      { name:'삼성증권',  market:'kr', pct:2.0 },
+      { name:'LRCX',  market:'us', pct:6.0 },
+      { name:'IWM',   market:'us', pct:6.0, today:true, delta:1, change:'5→6 증액', sector:'러셀2000', note:'추세 확인, 지수 비중 보강' },
+      { name:'INTC',  market:'us', pct:5.0 },
+      { name:'ARM',   market:'us', pct:3.0 },
+      { name:'MRVL',  market:'us', pct:3.0 },
+      { name:'GS',    market:'us', pct:3.0 },
+      { name:'SNDK',  market:'us', pct:3.0 },
+      { name:'DDOG',  market:'us', pct:3.0 },
+      { name:'CAT',   market:'us', pct:3.0, today:true, delta:1, change:'2→3 증액', sector:'기계/AI인프라', note:'정통 AI 인프라 상승 확장 대응' },
+      { name:'AMAT',  market:'us', pct:3.0, today:true, delta:1, change:'2→3 증액', sector:'반도체장비', note:'변동성 낮고 편입비중 낮아 우선 증액' },
+      { name:'BE',    market:'us', pct:2.0, today:true, delta:2, change:'0→2 재편입', sector:'연료전지', note:'재랠리 전환, AI 인프라 확장' },
+      { name:'CSCO',  market:'us', pct:2.0 }
+    ];
+    const EXTENDED_PORT = ['피에스케이', '삼성중공업', 'GEV', 'VRT'];
+    const latestDate = '6/19';
+    const kr = holdings.filter(h=>h.market==='kr').sort((a,b)=>b.pct-a.pct);
+    const us = holdings.filter(h=>h.market==='us').sort((a,b)=>b.pct-a.pct);
+    const krt = +(kr.reduce((s,h)=>s+h.pct,0)).toFixed(1);
+    const ust = +(us.reduce((s,h)=>s+h.pct,0)).toFixed(1);
+    const total = +(krt+ust).toFixed(1);
+    const cash = +(100-total).toFixed(1);
+    const changed = holdings.filter(h=>h.today).sort((a,b)=>(b.delta||0)-(a.delta||0));
+    const maxPct = Math.max(...holdings.map(h=>h.pct));
+    const barRow = (h, color) => {
+      const w = (h.pct/maxPct*100).toFixed(1);
+      const star = h.today ? '<span style="color:#fbbf24;margin-right:3px;">★</span>' : '';
+      const border = h.today ? '2px solid #fbbf24' : '2px solid transparent';
+      return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">' +
+        '<div style="width:82px;text-align:right;font-size:11.5px;color:'+(h.today?'#fcd34d':'#cbd5e1')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:'+(h.today?'700':'400')+';">'+star+h.name+'</div>' +
+        '<div style="flex:1;display:flex;align-items:center;gap:5px;">' +
+          '<div style="background:'+color+';height:20px;width:'+w+'%;border-radius:3px;min-width:4px;border:'+border+';box-sizing:border-box;opacity:'+(h.today?1:0.82)+';"></div>' +
+          '<span style="font-size:11px;font-weight:700;color:#e2e8f0;min-width:28px;">'+h.pct+'%</span>' +
+        '</div></div>';
+    };
+    const changeCard = (h) =>
+      '<div style="border-left:3px solid #5b8dee;background:rgba(91,141,238,0.07);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:10px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">' +
+          '<span style="font-size:13px;font-weight:700;color:#e2e8f0;"><span style="color:#fbbf24;">★</span> '+h.name+'</span>' +
+          '<span style="font-size:12px;font-weight:700;color:#60a5fa;">'+h.change+'</span>' +
+        '</div>' +
+        '<div style="font-size:10.5px;color:#6b7280;margin-bottom:5px;">'+(h.market==='kr'?'한국':'미국')+' · '+(h.sector||'')+' · '+latestDate+'</div>' +
+        '<div style="font-size:11.5px;color:#94a3b8;">'+(h.note||'')+'</div>' +
+      '</div>';
+    document.getElementById('holdingsInner').innerHTML =
+      '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;">' +
+        '<div style="font-size:15px;font-weight:700;color:#e2e8f0;">찐샘 포트폴리오 보유종목</div>' +
+        '<div style="font-size:11px;color:#94a3b8;">'+latestDate+' 반영</div>' +
+      '</div>' +
+      '<div style="font-size:11px;color:#6b7280;margin-bottom:16px;">주식 '+total+'% (한국 '+krt+'% + 미국 '+ust+'%) · 현금 '+(cash>0?cash:0)+'%' +
+        '<span style="color:#fbbf24;margin-left:8px;">| '+latestDate+' 총 96%</span>' +
+      '</div>' +
+      '<div style="display:flex;gap:20px;align-items:flex-start;">' +
+        '<div style="flex:0 0 46%;min-width:0;">' +
+          '<div style="font-size:12.5px;font-weight:700;color:#f87171;margin-bottom:9px;">■ 한국 '+krt+'%</div>' +
+          kr.map(h=>barRow(h,'#e57373')).join('') +
+          '<div style="height:14px;"></div>' +
+          '<div style="font-size:12.5px;font-weight:700;color:#60a5fa;margin-bottom:9px;">■ 미국 '+ust+'%</div>' +
+          us.map(h=>barRow(h,'#5b8dee')).join('') +
+        '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          (changed.length ?
+            '<div style="font-size:12.5px;font-weight:700;color:#e2e8f0;margin-bottom:12px;">'+latestDate+' 변경 종목 매매근거</div>' +
+            changed.map(h=>changeCard(h)).join('') :
+            '<div style="color:#4b5563;font-size:13px;padding-top:20px;">오늘 변경 종목 없음</div>'
+          ) +
+        '</div>' +
+      '</div>' +
+      (EXTENDED_PORT.length ?
+        '<div style="margin-top:14px;padding:10px 14px;border:1px solid #fbbf24;border-radius:8px;display:inline-block;">' +
+          '<span style="font-size:11.5px;color:#fbbf24;font-weight:600;">확장포트 (비중 미관리):</span>' +
+          '<span style="font-size:11.5px;color:#94a3b8;margin-left:6px;">'+EXTENDED_PORT.join(' · ')+'</span>' +
+        '</div>' : '');
+  } catch(e) {
+    document.getElementById('err').innerHTML = '<div class="err">⚠️ 오류: ' + e.message + '</div>';
+    console.error(e);
+  }
+});
+</script>
+</body></html>
