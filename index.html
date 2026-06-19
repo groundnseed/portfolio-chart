@@ -12,7 +12,7 @@
   .sub { font-size:13px; color:#8ea3c7; margin-bottom:18px; }
   .section { margin-bottom:18px; }
   .section-label { font-size:11px; color:#4b5563; margin-bottom:4px; padding-left:4px; }
-  iframe { width:100%; border:none; border-radius:14px; display:block; }
+  iframe { width:100%; border:none; border-radius:14px; display:block; overflow:hidden; }
 </style>
 </head>
 <body>
@@ -22,33 +22,42 @@
 
   <div class="section">
     <div class="section-label">찐샘 포트폴리오 보유종목</div>
-    <iframe src="holdings.html" height="520" scrolling="no"></iframe>
+    <iframe src="holdings.html" id="f0" scrolling="no" onload="autoH(this)"></iframe>
   </div>
 
   <div class="section">
     <div class="section-label">Jin's Portfolio 비중 변화</div>
-    <iframe src="trend.html" height="560" scrolling="no"></iframe>
+    <iframe src="trend.html" id="f1" scrolling="no" onload="autoH(this)"></iframe>
   </div>
 
   <div class="section">
-    <div class="section-label">Jin's Portfolio 누적 수익률</div>
-    <iframe src="return.html" height="580" scrolling="no"></iframe>
+    <div class="section-label">Jin's Portfolio 누적 수익금</div>
+    <iframe src="return.html" id="f2" scrolling="no" onload="autoH(this)"></iframe>
   </div>
 
   <div class="section">
     <div class="section-label">종목별 현재 수익률</div>
-    <iframe src="stock-return.html" height="520" scrolling="no"></iframe>
+    <iframe src="stock-return.html" id="f3" scrolling="no" onload="autoH(this)"></iframe>
   </div>
 
   <div class="section">
     <div class="section-label">비중 vs 수익률 (사분면)</div>
-    <iframe src="quadrant.html" height="580" scrolling="no"></iframe>
+    <iframe src="quadrant.html" id="f4" scrolling="no" onload="autoH(this)"></iframe>
   </div>
 
   <div class="section">
     <div class="section-label">종목별 개별 차트</div>
-    <iframe src="stock-chart.html" height="820" scrolling="no"></iframe>
+    <iframe src="stock-chart.html" id="f5" scrolling="no" onload="autoH(this)"></iframe>
   </div>
 </div>
+<script>
+function autoH(fr) {
+  try {
+    var h = fr.contentDocument.documentElement.scrollHeight
+           || fr.contentDocument.body.scrollHeight;
+    fr.style.height = (h + 8) + 'px';
+  } catch(e) {}
+}
+</script>
 </body>
 </html>
