@@ -71,13 +71,13 @@ document.addEventListener('DOMContentLoaded', function() {
         '</div></div>';
     };
     const changeCard = (h) =>
-      '<div style="border-left:3px solid #5b8dee;background:rgba(91,141,238,0.07);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:10px;">' +
+      '<div style="border-left:2px solid #5b8dee;background:rgba(91,141,238,0.07);border-radius:0 6px 6px 0;padding:6px 8px;margin-bottom:6px;">' +
         '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">' +
-          '<span style="font-size:13px;font-weight:700;color:#e2e8f0;"><span style="color:#fbbf24;">★</span> '+h.name+'</span>' +
-          '<span style="font-size:12px;font-weight:700;color:#60a5fa;">'+h.change+'</span>' +
+          '<span style="font-size:10.5px;font-weight:700;color:#e2e8f0;'><span style="color:#fbbf24;">★</span> '+h.name+'</span>' +
+          '<span style="font-size:9.5px;font-weight:700;color:#60a5fa;">'+h.change+'</span>' +
         '</div>' +
-        '<div style="font-size:10.5px;color:#6b7280;margin-bottom:5px;">'+(h.market==='kr'?'한국':'미국')+' · '+(h.sector||'')+' · '+latestDate+'</div>' +
-        '<div style="font-size:11.5px;color:#94a3b8;">'+(h.note||'')+'</div>' +
+        '<div style="font-size:9px;color:#6b7280;margin-bottom:3px;">'+(h.market==='kr'?'한국':'미국')+' · '+(h.sector||'')+' · '+latestDate+'</div>' +
+        '<div style="font-size:9.5px;color:#94a3b8;">'+(h.note||'')+'</div>' +
       '</div>';
     document.getElementById('holdingsInner').innerHTML =
       '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;">' +
@@ -95,9 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
           '<div style="font-size:12.5px;font-weight:700;color:#60a5fa;margin-bottom:9px;">■ 미국 '+ust+'%</div>' +
           us.map(h=>barRow(h,'#5b8dee')).join('') +
         '</div>' +
-        '<div style="flex:1;min-width:0;">' +
+        '<div style="flex:0 0 26%;min-width:0;">' +
           (changed.length ?
-            '<div style="font-size:12.5px;font-weight:700;color:#e2e8f0;margin-bottom:12px;">'+latestDate+' 변경 종목 매매근거</div>' +
+            '<div style="font-size:10.5px;font-weight:700;color:#e2e8f0;margin-bottom:8px;">'+latestDate+' 변경 종목 매매근거</div>' +
             changed.map(h=>changeCard(h)).join('') :
             '<div style="color:#4b5563;font-size:13px;padding-top:20px;">오늘 변경 종목 없음</div>'
           ) +
