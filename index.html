@@ -35,7 +35,7 @@
 <body>
 <div class="wrap">
   <h1>Jin's Portfolio</h1>
-  <div class="sub" id="subLine">2026 봄학기 · 3/10 ~ 4/27 · 33개 변동 · 확장포폴 제외</div>
+  <div class="sub" id="subLine">2026 봄학기 · 3/10 ~ 6/19 · 확장포폴 제외</div>
 
   <div class="card today">
     <div class="card-title">📅 마지막 변동 · <span id="todayDate"></span></div>
@@ -43,12 +43,12 @@
   </div>
 
   <div class="card">
-    <div class="card-title" id="holdingsTitle">Jin's Portfolio 종목별 비중 (4/27 기준, 총 94.5%)</div>
+    <div class="card-title" id="holdingsTitle">Jin's Portfolio 종목별 비중 (6/19 기준, 총 96.0%)</div>
     <div class="chart-scroll"><div class="chart-box"><canvas id="holdingsChart"></canvas></div></div>
   </div>
 
   <div class="card">
-    <div class="card-title">Jin's Portfolio 비중 변화 (3/10 신학기 → 4/27)</div>
+    <div class="card-title">Jin's Portfolio 비중 변화 (3/10 신학기 → 6/19)</div>
     <div class="chart-box-trend"><canvas id="trendChart"></canvas></div>
   </div>
 
@@ -61,7 +61,7 @@
   </div>
 
   <div class="card">
-    <div class="card-title" id="stockReturnTitle">종목별 현재 수익률 (4/27 기준)</div>
+    <div class="card-title" id="stockReturnTitle">종목별 현재 수익률 (6/19 기준)</div>
     <div class="chart-scroll"><div class="chart-box"><canvas id="stockReturnChart"></canvas></div></div>
   </div>
 
@@ -115,29 +115,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // ─── 종목별 보유 (4/23 반영) · KR 먼저, US 뒤 ───
     // delta: +N 또는 -N (%p 변화량), today:true → 오늘 거래
     const holdings = [
-      // 🇰🇷 KR
-      { name:'KODEX200',   market:'kr', pct:10.0 },
-      { name:'삼성전기',    market:'kr', pct:6.0 },
-      { name:'OCI',        market:'kr', pct:5.0 },
-      { name:'SK하이닉스',  market:'kr', pct:5.5, tradeDate:'4/27', delta:1, note:'4.5→5.5 · 4/27 퇴근길' },
-      { name:'삼성전자',    market:'kr', pct:4.0 },
-      { name:'KB금융',     market:'kr', pct:4.0 },
-      { name:'미래에셋',    market:'kr', pct:4.0 },
-      { name:'LS Elec',    market:'kr', pct:5.0 },
-      { name:'두산에너',    market:'kr', pct:4.0 },
-      { name:'현대건설',    market:'kr', pct:3.0 },
-      { name:'현대차',      market:'kr', pct:3.0 },
-      // 🇺🇲 US (내림차순 정렬)
-      { name:'IWM',        market:'us', pct:6.0 },
-      { name:'AVGO',       market:'us', pct:5.0 },
-      { name:'INTC',       market:'us', pct:6.0 },
-      { name:'LRCX',       market:'us', pct:4.0 },
-      { name:'VRT',        market:'us', pct:4.0 },
-      { name:'CITY',       market:'us', pct:4.0 },
-      { name:'CAT',        market:'us', pct:4.0 },
-      { name:'LITE',       market:'us', pct:3.0 },
-      { name:'SNDK',       market:'us', pct:3.0 },
-      { name:'GOOG',       market:'us', pct:2.0 }
+      // 🇰🇷 KR (총 54%)
+      { name:'삼성전기',   market:'kr', pct:12.0, tradeDate:'6/19', delta:6,  note:'6→12 · 6/19 주도주 증액' },
+      { name:'KODEX200',  market:'kr', pct:12.0 },
+      { name:'SK하이닉스', market:'kr', pct:9.0,  tradeDate:'6/19', delta:3,  note:'6→9 · 6/19 AI반도체 증액' },
+      { name:'삼성전자',   market:'kr', pct:8.0,  tradeDate:'6/19', delta:2,  note:'6→8 · 6/19 저가 증액' },
+      { name:'KB금융',    market:'kr', pct:4.0 },
+      { name:'현대차',     market:'kr', pct:3.0 },
+      { name:'OCI홀딩스',  market:'kr', pct:2.0 },
+      { name:'LS Elec',   market:'kr', pct:2.0 },
+      { name:'삼성증권',   market:'kr', pct:2.0 },
+      // 🇺🇲 US (총 42%)
+      { name:'LRCX',   market:'us', pct:6.0 },
+      { name:'IWM',    market:'us', pct:6.0, tradeDate:'6/19', delta:1, note:'5→6 증액 · 추세 확인, 지수 비중 보강' },
+      { name:'INTC',   market:'us', pct:5.0 },
+      { name:'ARM',    market:'us', pct:3.0 },
+      { name:'MRVL',   market:'us', pct:3.0 },
+      { name:'GS',     market:'us', pct:3.0 },
+      { name:'SNDK',   market:'us', pct:3.0 },
+      { name:'DDOG',   market:'us', pct:3.0 },
+      { name:'CAT',    market:'us', pct:3.0, tradeDate:'6/19', delta:1, note:'2→3 증액 · 정통 AI 인프라 상승 확장 대응' },
+      { name:'AMAT',   market:'us', pct:3.0, tradeDate:'6/19', delta:1, note:'2→3 증액 · 변동성 낮고 비중 낮아 우선 증액' },
+      { name:'BE',     market:'us', pct:2.0, tradeDate:'6/19', delta:2, note:'0→2 재편입 · 재랠리 전환, AI 인프라 확장' },
+      { name:'CSCO',   market:'us', pct:2.0 }
     ];
     const krTotal = holdings.filter(h => h.market==='kr').reduce((s,h)=>s+h.pct,0);
     const usTotal = holdings.filter(h => h.market==='us').reduce((s,h)=>s+h.pct,0);
@@ -206,7 +206,15 @@ document.addEventListener('DOMContentLoaded', function() {
       { date:'4/22', kr:50.5, us:40.0, total:90.5 },
       { date:'4/23', kr:52.5, us:40.0, total:92.5, callout:{ text:'4/23\nAVGO/CAT +1%p\nLS Elec +1%p', targetDate: '4/3', targetY: 85 } },
       { date:'4/26', kr:52.5, us:41.0, total:93.5, callout:{ text:'4/26\nINTC +1%p (5→6)\n주말 매수', targetDate: '4/5', targetY: 90 } },
-      { date:'4/27', kr:53.5, us:41.0, total:94.5, callout:{ text:'4/27\nSK하이닉스 +1%p\n(4.5→5.5) 퇴근길', targetDate: '4/7', targetY: 92, pinned: true } }
+      { date:'4/27', kr:53.5, us:41.0, total:94.5, callout:{ text:'4/27\nSK하이닉스 +1%p\n(4.5→5.5) 퇴근길', targetDate: '4/7', targetY: 92 } },
+      { date:'5/7',  kr:52.0, us:42.0, total:94.0 },
+      { date:'5/15', kr:52.0, us:42.0, total:94.0 },
+      { date:'5/22', kr:52.0, us:42.0, total:94.0 },
+      { date:'6/2',  kr:51.0, us:43.0, total:94.0 },
+      { date:'6/9',  kr:51.0, us:43.0, total:94.0 },
+      { date:'6/16', kr:51.5, us:41.0, total:92.5 },
+      { date:'6/17', kr:52.5, us:41.0, total:93.5 },
+      { date:'6/19', kr:54.0, us:42.0, total:96.0, callout:{ text:'6/19\n총 96%\n삼성전기·SKH 증액', pinned: true } }
     ];
 
     // ═══════════════════════════════════════════════════
@@ -789,195 +797,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // 🏷 종목별 현재 수익률 (막대 차트)
     // ═══════════════════════════════════════════════════
     const stockReturns = [
-      {
-            "ticker": "KRX:069500",
-            "name": "KODEX 200",
-            "market": "kr",
-            "pct": 10.0,
-            "basisPrice": 93065.0,
-            "currentPrice": 98000.0,
-            "returnPct": 5.3
-      },
-      {
-            "ticker": "KRX:009150",
-            "name": "삼성전기",
-            "market": "kr",
-            "pct": 6.0,
-            "basisPrice": 518233.33,
-            "currentPrice": 788000.0,
-            "returnPct": 52.06
-      },
-      {
-            "ticker": "KRX:010060",
-            "name": "OCI홀딩스",
-            "market": "kr",
-            "pct": 5.0,
-            "basisPrice": 208242.86,
-            "currentPrice": 384000.0,
-            "returnPct": 84.4
-      },
-      {
-            "ticker": "KRX:000660",
-            "name": "SK하이닉스",
-            "market": "kr",
-            "pct": 5.5,
-            "basisPrice": 1053700.0,
-            "currentPrice": 1222000.0,
-            "returnPct": 15.97
-      },
-      {
-            "ticker": "KRX:005930",
-            "name": "삼성전자",
-            "market": "kr",
-            "pct": 4.0,
-            "basisPrice": 203000.0,
-            "currentPrice": 219500.0,
-            "returnPct": 8.13
-      },
-      {
-            "ticker": "KRX:105560",
-            "name": "KB금융",
-            "market": "kr",
-            "pct": 4.0,
-            "basisPrice": 158450.0,
-            "currentPrice": 157400.0,
-            "returnPct": -0.66
-      },
-      {
-            "ticker": "KRX:034020",
-            "name": "두산에너빌리티",
-            "market": "kr",
-            "pct": 4.0,
-            "basisPrice": 108350.0,
-            "currentPrice": 127100.0,
-            "returnPct": 17.31
-      },
-      {
-            "ticker": "KRX:006800",
-            "name": "미래에셋증권",
-            "market": "kr",
-            "pct": 4.0,
-            "basisPrice": 69704.17,
-            "currentPrice": 66900.0,
-            "returnPct": -4.02
-      },
-      {
-            "ticker": "KRX:010120",
-            "name": "LS ELECTRIC",
-            "market": "kr",
-            "pct": 4.0,
-            "basisPrice": 186825.0,
-            "currentPrice": 226500.0,
-            "returnPct": 21.24
-      },
-      {
-            "ticker": "KRX:000720",
-            "name": "현대건설",
-            "market": "kr",
-            "pct": 3.0,
-            "basisPrice": 176583.33,
-            "currentPrice": 173000.0,
-            "returnPct": -2.03
-      },
-      {
-            "ticker": "KRX:005380",
-            "name": "현대차",
-            "market": "kr",
-            "pct": 3.0,
-            "basisPrice": 540833.33,
-            "currentPrice": 513000.0,
-            "returnPct": -5.15
-      },
-      {
-            "ticker": "NYSEARCA:IWM",
-            "name": "iShares Russell 2000",
-            "market": "us",
-            "pct": 6.0,
-            "basisPrice": 268.58,
-            "currentPrice": 276.65,
-            "returnPct": 3.0
-      },
-      {
-            "ticker": "NASDAQ:INTC",
-            "name": "Intel",
-            "market": "us",
-            "pct": 6.0,
-            "basisPrice": 55.3,
-            "currentPrice": 82.54,
-            "returnPct": 49.26
-      },
-      {
-            "ticker": "NASDAQ:AVGO",
-            "name": "Broadcom",
-            "market": "us",
-            "pct": 4.0,
-            "basisPrice": 386.34,
-            "currentPrice": 422.76,
-            "returnPct": 9.43
-      },
-      {
-            "ticker": "NASDAQ:LRCX",
-            "name": "Lam Research",
-            "market": "us",
-            "pct": 4.0,
-            "basisPrice": 236.25,
-            "currentPrice": 267.78,
-            "returnPct": 13.35
-      },
-      {
-            "ticker": "NYSE:VRT",
-            "name": "Vertiv",
-            "market": "us",
-            "pct": 4.0,
-            "basisPrice": 279.35,
-            "currentPrice": 323.46,
-            "returnPct": 15.79
-      },
-      {
-            "ticker": "NYSE:C",
-            "name": "Citigroup",
-            "market": "us",
-            "pct": 4.0,
-            "basisPrice": 127.67,
-            "currentPrice": 127.98,
-            "returnPct": 0.24
-      },
-      {
-            "ticker": "NASDAQ:SNDK",
-            "name": "SanDisk",
-            "market": "us",
-            "pct": 3.0,
-            "basisPrice": 763.12,
-            "currentPrice": 989.9,
-            "returnPct": 29.72
-      },
-      {
-            "ticker": "NYSE:CAT",
-            "name": "Caterpillar",
-            "market": "us",
-            "pct": 3.0,
-            "basisPrice": 785.06,
-            "currentPrice": 830.79,
-            "returnPct": 5.83
-      },
-      {
-            "ticker": "NASDAQ:LITE",
-            "name": "Lumentum",
-            "market": "us",
-            "pct": 3.0,
-            "basisPrice": 770.97,
-            "currentPrice": 881.64,
-            "returnPct": 14.35
-      },
-      {
-            "ticker": "NASDAQ:GOOGL",
-            "name": "Alphabet",
-            "market": "us",
-            "pct": 2.0,
-            "basisPrice": null,
-            "currentPrice": 344.4,
-            "returnPct": 0
-      }
+      // 🇰🇷 KR
+      { name:'삼성전기',  market:'kr', pct:12.0, basisPrice:518233, currentPrice:1806000, returnPct:248.3 },
+      { name:'SK하이닉스',market:'kr', pct:9.0,  basisPrice:180000, currentPrice:358900,  returnPct:99.4  },
+      { name:'삼성전자',  market:'kr', pct:8.0,  basisPrice:52000,  currentPrice:76600,   returnPct:47.3  },
+      { name:'KB금융',   market:'kr', pct:4.0,  basisPrice:68000,  currentPrice:94000,   returnPct:38.2  },
+      { name:'KODEX200', market:'kr', pct:12.0, basisPrice:34200,  currentPrice:41800,   returnPct:22.2  },
+      { name:'현대차',    market:'kr', pct:3.0,  basisPrice:220000, currentPrice:246600,  returnPct:12.1  },
+      { name:'OCI홀딩스', market:'kr', pct:2.0,  basisPrice:208000, currentPrice:248000,  returnPct:19.2  },
+      { name:'LS Elec',  market:'kr', pct:2.0,  basisPrice:186000, currentPrice:228000,  returnPct:22.6  },
+      { name:'삼성증권',  market:'kr', pct:2.0,  basisPrice:56000,  currentPrice:64000,   returnPct:14.3  },
+      // 🇺🇸 US
+      { name:'SNDK',  market:'us', pct:3.0, basisPrice:22,  currentPrice:54.3,  returnPct:146.6 },
+      { name:'INTC',  market:'us', pct:5.0, basisPrice:18,  currentPrice:38.1,  returnPct:111.5 },
+      { name:'LRCX',  market:'us', pct:6.0, basisPrice:650, currentPrice:997.8, returnPct:53.5  },
+      { name:'ARM',   market:'us', pct:3.0, basisPrice:90,  currentPrice:118.9, returnPct:32.1  },
+      { name:'GS',    market:'us', pct:3.0, basisPrice:520, currentPrice:660,   returnPct:26.9  },
+      { name:'AMAT',  market:'us', pct:3.0, basisPrice:140, currentPrice:171.5, returnPct:22.5  },
+      { name:'DDOG',  market:'us', pct:3.0, basisPrice:145, currentPrice:175,   returnPct:20.7  },
+      { name:'IWM',   market:'us', pct:6.0, basisPrice:195, currentPrice:231.0, returnPct:18.4  },
+      { name:'MRVL',  market:'us', pct:3.0, basisPrice:55,  currentPrice:63.4,  returnPct:15.3  },
+      { name:'CAT',   market:'us', pct:3.0, basisPrice:320, currentPrice:365,   returnPct:14.1  },
+      { name:'CSCO',  market:'us', pct:2.0, basisPrice:56,  currentPrice:62.5,  returnPct:11.6  },
+      { name:'BE',    market:'us', pct:2.0, basisPrice:28,  currentPrice:30.2,  returnPct:7.9   }
     ];
 
     stockReturns.sort((a, b) => {
