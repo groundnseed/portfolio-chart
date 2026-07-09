@@ -22,22 +22,24 @@
 document.addEventListener('DOMContentLoaded', function() {
   try {
     const holdings = [
-      { name:'삼성전자',  market:'kr', pct:4.0 },
-      { name:'KB금융',   market:'kr', pct:2.5 },
-      { name:'SK하이닉스',market:'kr', pct:2.0 },
-      { name:'삼성전기',  market:'kr', pct:2.0 },
-      { name:'LS Electric',market:'kr',pct:2.0 },
-      { name:'삼성증권',  market:'kr', pct:2.0 },
-      { name:'IWM',   market:'us', pct:4.5, today:true, delta:2.5, change:'7→4.5 축소', sector:'러셀2000', note:'7/8 전반적 비중 축소' },
-      { name:'INTC',  market:'us', pct:4.0, today:true, delta:2,   change:'6→4 축소',   sector:'반도체',   note:'7/8 전반적 비중 축소' },
-      { name:'DDOG',  market:'us', pct:4.0 },
-      { name:'CAT',   market:'us', pct:2.5, today:true, delta:2.5, change:'5→2.5 축소', sector:'기계/AI인프라', note:'7/8 전반적 비중 축소' },
-      { name:'GS',    market:'us', pct:3.0 },
-      { name:'LRCX',  market:'us', pct:3.0, today:true, delta:1.5, change:'4.5→3 축소', sector:'반도체장비', note:'7/8 전반적 비중 축소' },
-      { name:'AMAT',  market:'us', pct:2.0, today:true, delta:1.5, change:'3.5→2 축소', sector:'반도체장비', note:'7/8 전반적 비중 축소' },
-      { name:'GEV',   market:'us', pct:2.0, today:true, delta:1,   change:'3→2 축소',   sector:'에너지/GE버노바', note:'7/8 전반적 비중 축소' },
-      { name:'SNDK',  market:'us', pct:2.0 },
-      { name:'CSCO',  market:'us', pct:2.0 },
+      { name:'KB금융',      market:'kr', pct:2.5 },
+      { name:'삼성전기',    market:'kr', pct:2.0 },
+      { name:'SK하이닉스',  market:'kr', pct:2.0 },
+      { name:'LS Electric', market:'kr', pct:2.0 },
+      { name:'삼성전자',    market:'kr', pct:2.0 },
+      { name:'삼성증권',    market:'kr', pct:2.0 },
+      { name:'IWM',  market:'us', pct:4.5, today:true, delta:2.0, change:'6.5→4.5 축소', sector:'러셀2000',       note:'반도체 전역 추가 약세·금리 급등 위험관리' },
+      { name:'INTC', market:'us', pct:4.0, today:true, delta:2.0, change:'6→4 축소',     sector:'반도체',         note:'반도체 전역 추가 약세·금리 급등 위험관리' },
+      { name:'DDOG', market:'us', pct:4.0 },
+      { name:'LRCX', market:'us', pct:3.0, today:true, delta:1.5, change:'4.5→3 축소',   sector:'반도체장비',     note:'반도체 전역 추가 약세·금리 급등 위험관리' },
+      { name:'GS',   market:'us', pct:3.0 },
+      { name:'CAT',  market:'us', pct:2.5, today:true, delta:2.5, change:'5→2.5 최소화', sector:'기계/AI인프라',  note:'단기 추세 상실 확인 → 비중 최소화' },
+      { name:'AMAT', market:'us', pct:2.0, today:true, delta:1.0, change:'3→2 축소',     sector:'반도체장비',     note:'반도체 전역 추가 약세·금리 급등 위험관리' },
+      { name:'GEV',  market:'us', pct:2.0, today:true, delta:1.0, change:'3→2 최소화',   sector:'에너지/GE버노바',note:'단기 추세 상실 확인 → 비중 최소화' },
+      { name:'SNDK', market:'us', pct:2.0 },
+      { name:'CSCO', market:'us', pct:2.0 },
+      { name:'BE',   market:'us', pct:2.0 },
+      { name:'ARM',  market:'us', pct:0,   today:true, delta:2.0, change:'2→0 편출',     sector:'CPU/AI반도체',   note:'CPU 랠리 종료 개연성 — INTC도 1/3축소' },
     ];
     const EXTENDED_PORT = [
       { name:'피에스케이', date:'6/14' },
@@ -46,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
     const latestDate = '7/8';
     const kr = holdings.filter(h=>h.market==='kr').sort((a,b)=>b.pct-a.pct);
-    const us = holdings.filter(h=>h.market==='us').sort((a,b)=>b.pct-a.pct);
+    const us = holdings.filter(h=>h.market==='us' && h.pct>0).sort((a,b)=>b.pct-a.pct);
     const krt = +(kr.reduce((s,h)=>s+h.pct,0)).toFixed(1);
     const ust = +(us.reduce((s,h)=>s+h.pct,0)).toFixed(1);
     const total = +(krt+ust).toFixed(1);
@@ -65,10 +67,10 @@ document.addEventListener('DOMContentLoaded', function() {
         '</div></div>';
     };
     const changeCard = (h) =>
-      '<div style="border-left:3px solid #5b8dee;background:rgba(91,141,238,0.07);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:10px;">' +
+      '<div style="border-left:3px solid '+(h.pct===0?'#f87171':'#5b8dee')+';background:rgba('+(h.pct===0?'248,113,113':'91,141,238')+',0.07);border-radius:0 8px 8px 0;padding:10px 12px;margin-bottom:10px;">' +
         '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">' +
-          '<span style="font-size:13px;font-weight:700;color:#e2e8f0;"><span style="color:#fbbf24;">★</span> '+h.name+'</span>' +
-          '<span style="font-size:12px;font-weight:700;color:#60a5fa;">'+h.change+'</span>' +
+          '<span style="font-size:13px;font-weight:700;color:#e2e8f0;">'+(h.pct===0?'<span style="color:#f87171;">×</span>':'<span style="color:#fbbf24;">★</span>')+' '+h.name+'</span>' +
+          '<span style="font-size:12px;font-weight:700;color:'+(h.pct===0?'#f87171':'#60a5fa')+';">'+h.change+'</span>' +
         '</div>' +
         '<div style="font-size:10.5px;color:#6b7280;margin-bottom:5px;">'+(h.market==='kr'?'한국':'미국')+' · '+(h.sector||'')+' · '+latestDate+'</div>' +
         '<div style="font-size:11.5px;color:#94a3b8;">'+(h.note||'')+'</div>' +
@@ -79,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         '<div style="font-size:11px;color:#94a3b8;">'+latestDate+' 반영</div>' +
       '</div>' +
       '<div style="font-size:11px;color:#6b7280;margin-bottom:16px;">주식 '+total+'% (한국 '+krt+'% + 미국 '+ust+'%) · 현금 '+(cash>0?cash:0)+'%' +
-        '<span style="color:#fbbf24;margin-left:8px;">| '+latestDate+' 총 '+total+'%</span>' +
+        '<span style="color:#fbbf24;margin-left:8px;">| '+latestDate+' 미국 -13.0%p (INTC·LRCX·AMAT·IWM 1/3축소, CAT 1/2, GEV 최소, ARM 편출)</span>' +
       '</div>' +
       '<div style="display:flex;gap:20px;align-items:flex-start;">' +
         '<div style="flex:0 0 46%;min-width:0;">' +
