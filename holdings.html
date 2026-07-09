@@ -1,3 +1,5 @@
+$ cat /home/user/portfolio-chart/holdings.html
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -22,35 +24,29 @@
 document.addEventListener('DOMContentLoaded', function() {
   try {
     const holdings = [
-      { name:'삼성전기',  market:'kr', pct:12.0, today:true, delta:6,  change:'6→12',  sector:'한국·IT부품', note:'동일(편입비중 재표기)' },
-      { name:'KODEX200', market:'kr', pct:12.0 },
-      { name:'SK하이닉스',market:'kr', pct:9.0,  today:true, delta:2.5,change:'6.5→9', sector:'한국·반도체',  note:'수량복원 매입단가 상승 → 편입비중 재표기' },
-      { name:'삼성전자',  market:'kr', pct:8.0,  today:true, delta:1,  change:'7→8',   sector:'한국·반도체',  note:'6/18 삼성액' },
-      { name:'KB금융',   market:'kr', pct:4.0 },
-      { name:'현대차',    market:'kr', pct:3.0 },
-      { name:'OCI홀딩스', market:'kr', pct:2.0 },
+      { name:'삼성전자',  market:'kr', pct:4.0 },
+      { name:'KB금융',   market:'kr', pct:2.5 },
+      { name:'SK하이닉스',market:'kr', pct:2.0 },
+      { name:'삼성전기',  market:'kr', pct:2.0 },
       { name:'LS Electric',market:'kr',pct:2.0 },
       { name:'삼성증권',  market:'kr', pct:2.0 },
-      { name:'LRCX',  market:'us', pct:6.0 },
-      { name:'IWM',   market:'us', pct:6.0, today:true, delta:1, change:'5→6 증액', sector:'러셀2000', note:'추세 확인, 지수 비중 보강' },
-      { name:'INTC',  market:'us', pct:5.0 },
-      { name:'ARM',   market:'us', pct:3.0 },
-      { name:'MRVL',  market:'us', pct:3.0 },
+      { name:'IWM',   market:'us', pct:4.5, today:true, delta:2.5, change:'7→4.5 축소', sector:'러셀2000', note:'7/8 전반적 비중 축소' },
+      { name:'INTC',  market:'us', pct:4.0, today:true, delta:2,   change:'6→4 축소',   sector:'반도체',   note:'7/8 전반적 비중 축소' },
+      { name:'DDOG',  market:'us', pct:4.0 },
+      { name:'CAT',   market:'us', pct:2.5, today:true, delta:2.5, change:'5→2.5 축소', sector:'기계/AI인프라', note:'7/8 전반적 비중 축소' },
       { name:'GS',    market:'us', pct:3.0 },
-      { name:'SNDK',  market:'us', pct:3.0 },
-      { name:'DDOG',  market:'us', pct:3.0 },
-      { name:'CAT',   market:'us', pct:3.0, today:true, delta:1, change:'2→3 증액', sector:'기계/AI인프라', note:'정통 AI 인프라 상승 확장 대응' },
-      { name:'AMAT',  market:'us', pct:3.0, today:true, delta:1, change:'2→3 증액', sector:'반도체장비', note:'변동성 낮고 편입비중 낮아 우선 증액' },
-      { name:'BE',    market:'us', pct:2.0, today:true, delta:2, change:'0→2 재편입', sector:'연료전지', note:'재랠리 전환, AI 인프라 확장' },
-      { name:'CSCO',  market:'us', pct:2.0 }
+      { name:'LRCX',  market:'us', pct:3.0, today:true, delta:1.5, change:'4.5→3 축소', sector:'반도체장비', note:'7/8 전반적 비중 축소' },
+      { name:'AMAT',  market:'us', pct:2.0, today:true, delta:1.5, change:'3.5→2 축소', sector:'반도체장비', note:'7/8 전반적 비중 축소' },
+      { name:'GEV',   market:'us', pct:2.0, today:true, delta:1,   change:'3→2 축소',   sector:'에너지/GE버노바', note:'7/8 전반적 비중 축소' },
+      { name:'SNDK',  market:'us', pct:2.0 },
+      { name:'CSCO',  market:'us', pct:2.0 },
     ];
     const EXTENDED_PORT = [
       { name:'피에스케이', date:'6/14' },
       { name:'삼성중공업', date:'4/27' },
-      { name:'GEV',       date:'4/27' },
       { name:'VRT',       date:'5/29' },
     ];
-    const latestDate = '6/19';
+    const latestDate = '7/8';
     const kr = holdings.filter(h=>h.market==='kr').sort((a,b)=>b.pct-a.pct);
     const us = holdings.filter(h=>h.market==='us').sort((a,b)=>b.pct-a.pct);
     const krt = +(kr.reduce((s,h)=>s+h.pct,0)).toFixed(1);
@@ -85,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
         '<div style="font-size:11px;color:#94a3b8;">'+latestDate+' 반영</div>' +
       '</div>' +
       '<div style="font-size:11px;color:#6b7280;margin-bottom:16px;">주식 '+total+'% (한국 '+krt+'% + 미국 '+ust+'%) · 현금 '+(cash>0?cash:0)+'%' +
-        '<span style="color:#fbbf24;margin-left:8px;">| '+latestDate+' 총 96%</span>' +
+        '<span style="color:#fbbf24;margin-left:8px;">| '+latestDate+' 총 '+total+'%</span>' +
       '</div>' +
       '<div style="display:flex;gap:20px;align-items:flex-start;">' +
         '<div style="flex:0 0 46%;min-width:0;">' +
