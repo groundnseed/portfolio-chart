@@ -80,13 +80,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const td=new Set(s.weights.map(w=>w[0]));
         new Chart(cv.getContext('2d'),{
           data:{ labels, datasets:[
-            {type:'line',data:prices,yAxisID:'yP',borderColor:'#ec4899',borderWidth:1.5,pointRadius:0,tension:0.2,fill:false},
+            {type:'line',data:prices,yAxisID:'yP',borderColor:'#ec4899',borderWidth:1.5,pointRadius:0,tension:0,fill:false},
             {type:'line',data:weights,yAxisID:'yW',borderColor:'#5b8dee',borderWidth:2,
               pointRadius:labels.map(l=>td.has(l)?5:0),
               pointBackgroundColor:labels.map(l=>td.has(l)?'#ef4444':'transparent'),
               pointBorderColor:labels.map(l=>td.has(l)?'#ef4444':'transparent'),
               stepped:'before',fill:false},
-            {type:'line',data:returns,yAxisID:'yR',borderColor:'#34d399',borderWidth:1.5,pointRadius:0,tension:0.2,fill:false}
+            {type:'line',data:returns,yAxisID:'yR',borderColor:'#34d399',borderWidth:1.5,pointRadius:0,tension:0,fill:false}
           ]},
           options:{
             responsive:true, maintainAspectRatio:false, animation:false,
