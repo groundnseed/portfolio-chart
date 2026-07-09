@@ -16,8 +16,8 @@
 <body>
 <div class="card">
   <div class="card-title">종목별 현재 수익률</div>
-  <div class="card-sub">공지일 익일 시가+종가 ÷ 2 · 가중평균 매수가 기준 · 6/19 반영</div>
-  <div style="position:relative;height:620px;">
+  <div class="card-sub">공지일 익일 시가+종가 ÷ 2 · 가중평균 매수가 기준 · 7/8 반영</div>
+  <div style="position:relative;height:510px;">
     <canvas id="srChart"></canvas>
   </div>
 </div>
@@ -25,27 +25,23 @@
 if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
 
 const stocks = [
-  { name:'삼성전기',   m:'kr', buy:703917,  cur:1145000, r:62.7 },
-  { name:'KODEX200',  m:'kr', buy:112562,  cur:146910,  r:30.5 },
-  { name:'SK하이닉스', m:'kr', buy:1656944, cur:2764000, r:66.8 },
-  { name:'삼성전자',  m:'kr', buy:256719,  cur:354000,  r:37.9 },
-  { name:'KB금융',    m:'kr', buy:155575,  cur:158300,  r:1.8  },
-  { name:'현대차',    m:'kr', buy:572833,  cur:613000,  r:7.0  },
-  { name:'OCI홀딩스', m:'kr', buy:145350,  cur:256500,  r:76.5 },
-  { name:'LS Electric',m:'kr',buy:146900,  cur:259000,  r:76.3 },
-  { name:'삼성증권',  m:'kr', buy:123050,  cur:118900,  r:-3.4 },
-  { name:'LRCX',  m:'us', buy:277.23,  cur:389.04,  r:40.3 },
-  { name:'IWM',   m:'us', buy:281.13,  cur:295.59,  r:5.1  },
-  { name:'INTC',  m:'us', buy:73.56,   cur:133.99,  r:82.1 },
-  { name:'ARM',   m:'us', buy:415.43,  cur:439.46,  r:5.8  },
-  { name:'MRVL',  m:'us', buy:212.43,  cur:310.58,  r:46.2 },
-  { name:'GS',    m:'us', buy:1088.17, cur:1096.56, r:0.8  },
-  { name:'SNDK',  m:'us', buy:824.90,  cur:2184.75, r:164.8},
-  { name:'DDOG',  m:'us', buy:232.63,  cur:223.00,  r:-4.1 },
-  { name:'CAT',   m:'us', buy:855.71,  cur:985.82,  r:15.2 },
-  { name:'AMAT',  m:'us', buy:597.62,  cur:617.11,  r:3.3  },
-  { name:'BE',    m:'us', buy:328.91,  cur:328.91,  r:0.0  },
-  { name:'CSCO',  m:'us', buy:118.15,  cur:119.54,  r:1.2  },
+  { name:'삼성전기',   m:'kr', buy:703917,  cur:1526000, r:116.8 },
+  { name:'SK하이닉스', m:'kr', buy:1656944, cur:2076000, r:25.3  },
+  { name:'LS Electric',m:'kr', buy:146900,  cur:183500,  r:25.0  },
+  { name:'삼성전자',   m:'kr', buy:256719,  cur:277500,  r:8.1   },
+  { name:'KB금융',     m:'kr', buy:155575,  cur:170100,  r:9.3   },
+  { name:'삼성증권',   m:'kr', buy:123050,  cur:107900,  r:-12.3 },
+  { name:'SNDK',  m:'us', buy:824.90,   cur:1727.18, r:109.4 },
+  { name:'INTC',  m:'us', buy:73.56,    cur:110.24,  r:49.9  },
+  { name:'LRCX',  m:'us', buy:277.23,   cur:326.13,  r:17.6  },
+  { name:'DDOG',  m:'us', buy:232.63,   cur:261.09,  r:12.2  },
+  { name:'CAT',   m:'us', buy:855.71,   cur:948.08,  r:10.8  },
+  { name:'IWM',   m:'us', buy:281.13,   cur:293.48,  r:4.4   },
+  { name:'GEV',   m:'us', buy:1069.55,  cur:1070.99, r:0.1   },
+  { name:'AMAT',  m:'us', buy:597.62,   cur:593.50,  r:-0.7  },
+  { name:'CSCO',  m:'us', buy:118.15,   cur:113.82,  r:-3.7  },
+  { name:'GS',    m:'us', buy:1088.17,  cur:1028.01, r:-5.5  },
+  { name:'BE',    m:'us', buy:328.91,   cur:254.29,  r:-22.7 },
 ];
 
 stocks.sort((a,b) => b.r - a.r);
