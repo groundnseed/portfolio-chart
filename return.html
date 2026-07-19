@@ -15,8 +15,8 @@
 <body>
 <div class="card">
   <div style="font-size:14px;font-weight:700;color:#b8c5dc;margin-bottom:10px;text-align:center;">
-    Jin&#39;s Portfolio 누적 수익금
-    <span style="color:#6b7280;font-size:11px;font-weight:400;">(원금 1,000만원 기준)</span>
+    Jin&#39;s Portfolio 누적 실현손익
+    <span style="color:#6b7280;font-size:11px;font-weight:400;">(찐매매내역 기준 · 3/10~7/8)</span>
   </div>
   <div style="position:relative;height:480px;"><canvas id="returnChart"></canvas></div>
   <div style="text-align:center;font-size:11px;margin-top:8px;" id="returnNote"></div>
@@ -28,46 +28,86 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof Chart === 'undefined') throw new Error('Chart.js 로드 실패');
     if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
 
-    // 노션 "💰 1억 투자 수익금 추이" DB에서 가져온 실제 데이터
-    // 1억 기준 → 1천만원 기준으로 /10 환산
-    const SCALE = 0.1;
-    const raw = [
-      { date:'3/10', total:-557, kr:-407, us:-149, note:'봄학기 첫 편입 (총 30%)' },
-      { date:'3/13', total:-563, kr:-401, us:-162, note:'' },
-      { date:'3/17', total:-392, kr:-288, us:-104, note:'' },
-      { date:'3/19', total:-185, kr:-158, us:-27,  note:'' },
-      { date:'3/24', total:-397, kr:-345, us:-51,  note:'' },
-      { date:'3/26', total:-496, kr:-353, us:-143, note:'' },
-      { date:'3/27', total:-501, kr:-362, us:-139, note:'금리 급등 + AI H/W 충격 → 트리밍' },
-      { date:'4/2',  total:-527, kr:-492, us:-35,  note:'' },
-      { date:'4/3',  total:-377, kr:-377, us:0,    note:'' },
-      { date:'4/6',  total:-387, kr:-349, us:-39,  note:'' },
-      { date:'4/8',  total:-51,  kr:-116, us:65,   note:'🎉 휴전선언, 한국 13% 증액' },
-      { date:'4/9',  total:-62,  kr:-173, us:112,  note:'' },
-      { date:'4/14', total:142,  kr:-17,  us:158,  note:'LIVE 6 대쪽증액' },
-      { date:'4/15', total:239,  kr:105,  us:134,  note:'' },
-      { date:'4/16', total:433,  kr:265,  us:169,  note:'' },
-      { date:'4/17', total:433,  kr:246,  us:187,  note:'' },
-      { date:'4/21', total:557,  kr:408,  us:149,  note:'미세조정 시작 (85% 도달)' },
-      { date:'4/28', total:881,  kr:677,  us:204,  note:'' },
-      { date:'5/1',  total:364,  kr:0,    us:364,  note:'' },
-      { date:'5/15', total:1817, kr:1288, us:529,  note:'' },
-      { date:'5/19', total:1606, kr:1104, us:502,  note:'' },
-      { date:'5/29', total:3258, kr:2591, us:667,  note:'' },
-      { date:'6/1',  total:3379, kr:2684, us:696,  note:'최고점' },
-      { date:'6/3',  total:806,  kr:0,    us:806,  note:'' },
-      { date:'6/4',  total:3099, kr:2319, us:780,  note:'' },
-      { date:'6/9',  total:2851, kr:2181, us:670,  note:'' },
-      { date:'6/11', total:2744, kr:1903, us:841,  note:'BE 편출' },
+    // 찐매매내역 구글시트 "📊 분석" 탭의 날짜별·종목별 실현손익(원)을
+    // 한국/미국 시장으로 합산한 실제 누적 실현손익 (단위: 만원)
+    const events = [
+      { date:'3/10', total:0.0, kr:0.0, us:0.0, note:'첫 편입' },
+      { date:'3/15', total:0.0, kr:0.0, us:0.0, note:'' },
+      { date:'3/17', total:0.0, kr:0.0, us:0.0, note:'' },
+      { date:'3/18', total:0.0, kr:0.0, us:0.0, note:'' },
+      { date:'3/19', total:0.0, kr:0.0, us:0.0, note:'' },
+      { date:'3/20', total:0.0, kr:0.0, us:0.0, note:'' },
+      { date:'3/22', total:-23.4, kr:-23.4, us:0.0, note:'' },
+      { date:'3/23', total:-34.9, kr:-34.9, us:0.0, note:'' },
+      { date:'3/25', total:-42.2, kr:-34.9, us:-7.3, note:'' },
+      { date:'3/26', total:-104.8, kr:-97.5, us:-7.3, note:'' },
+      { date:'3/27', total:-153.3, kr:-135.6, us:-17.7, note:'' },
+      { date:'3/29', total:-153.3, kr:-135.6, us:-17.7, note:'' },
+      { date:'3/31', total:-216.7, kr:-135.6, us:-81.1, note:'관세 쇼크 저점' },
+      { date:'4/3', total:-216.7, kr:-135.6, us:-81.1, note:'' },
+      { date:'4/5', total:-216.7, kr:-135.6, us:-81.1, note:'' },
+      { date:'4/7', total:-216.7, kr:-135.6, us:-81.1, note:'' },
+      { date:'4/8', total:-216.7, kr:-135.6, us:-81.1, note:'' },
+      { date:'4/9', total:-216.7, kr:-135.6, us:-81.1, note:'' },
+      { date:'4/10', total:-216.7, kr:-135.6, us:-81.1, note:'' },
+      { date:'4/12', total:-216.7, kr:-135.6, us:-81.1, note:'' },
+      { date:'4/13', total:-216.7, kr:-135.6, us:-81.1, note:'' },
+      { date:'4/14', total:-216.7, kr:-135.6, us:-81.1, note:'' },
+      { date:'4/15', total:-215.8, kr:-134.6, us:-81.1, note:'' },
+      { date:'4/16', total:-215.8, kr:-134.6, us:-81.1, note:'' },
+      { date:'4/17', total:-215.8, kr:-134.6, us:-81.1, note:'' },
+      { date:'4/19', total:-215.8, kr:-134.6, us:-81.1, note:'' },
+      { date:'4/21', total:-215.8, kr:-134.6, us:-81.1, note:'' },
+      { date:'4/22', total:-215.8, kr:-134.6, us:-81.1, note:'' },
+      { date:'4/23', total:-215.8, kr:-134.6, us:-81.1, note:'' },
+      { date:'4/26', total:-215.8, kr:-134.6, us:-81.1, note:'' },
+      { date:'4/27', total:-215.8, kr:-134.6, us:-81.1, note:'' },
+      { date:'4/30', total:-206.1, kr:-134.6, us:-71.4, note:'' },
+      { date:'5/5', total:-206.5, kr:-134.6, us:-71.8, note:'' },
+      { date:'5/6', total:-207.5, kr:-135.7, us:-71.8, note:'' },
+      { date:'5/7', total:-215.1, kr:-143.2, us:-71.8, note:'' },
+      { date:'5/10', total:-215.1, kr:-143.2, us:-71.8, note:'' },
+      { date:'5/12', total:-213.2, kr:-141.4, us:-71.8, note:'' },
+      { date:'5/13', total:-204.1, kr:-132.2, us:-71.8, note:'' },
+      { date:'5/17', total:-4.0, kr:-30.9, us:26.9, note:'반도체 반등·익절 시작' },
+      { date:'5/19', total:76.9, kr:-0.7, us:77.5, note:'' },
+      { date:'5/20', total:80.4, kr:-10.2, us:90.6, note:'' },
+      { date:'5/21', total:80.4, kr:-10.2, us:90.6, note:'' },
+      { date:'5/22', total:80.4, kr:-10.2, us:90.6, note:'' },
+      { date:'5/24', total:80.4, kr:-10.2, us:90.6, note:'' },
+      { date:'5/26', total:80.4, kr:-10.2, us:90.6, note:'' },
+      { date:'5/27', total:80.4, kr:-10.2, us:90.6, note:'' },
+      { date:'5/28', total:78.4, kr:-10.2, us:88.6, note:'' },
+      { date:'5/29', total:119.5, kr:-10.2, us:129.7, note:'' },
+      { date:'5/31', total:173.2, kr:43.5, us:129.7, note:'' },
+      { date:'6/1', total:173.2, kr:43.5, us:129.7, note:'' },
+      { date:'6/2', total:192.7, kr:16.8, us:175.8, note:'' },
+      { date:'6/3', total:192.7, kr:16.8, us:175.8, note:'' },
+      { date:'6/4', total:210.3, kr:16.8, us:193.5, note:'' },
+      { date:'6/7', total:1012.1, kr:505.8, us:506.3, note:'삼성전기 대량 익절' },
+      { date:'6/8', total:980.0, kr:473.7, us:506.3, note:'' },
+      { date:'6/9', total:980.0, kr:473.7, us:506.3, note:'' },
+      { date:'6/10', total:901.8, kr:392.1, us:509.6, note:'' },
+      { date:'6/11', total:877.2, kr:392.1, us:485.1, note:'' },
+      { date:'6/12', total:877.2, kr:392.1, us:485.1, note:'' },
+      { date:'6/14', total:877.2, kr:392.1, us:485.1, note:'' },
+      { date:'6/15', total:877.2, kr:392.1, us:485.1, note:'' },
+      { date:'6/16', total:901.0, kr:392.1, us:508.9, note:'' },
+      { date:'6/17', total:901.0, kr:392.1, us:508.9, note:'' },
+      { date:'6/18', total:901.0, kr:392.1, us:508.9, note:'' },
+      { date:'6/23', total:1551.1, kr:1042.3, us:508.9, note:'하이닉스·삼성전기 익절' },
+      { date:'6/24', total:1544.2, kr:1042.3, us:502.0, note:'' },
+      { date:'6/25', total:1544.2, kr:1042.3, us:502.0, note:'' },
+      { date:'6/26', total:1544.2, kr:1042.3, us:502.0, note:'' },
+      { date:'6/28', total:1513.1, kr:1011.1, us:502.0, note:'' },
+      { date:'6/30', total:1513.1, kr:1011.1, us:502.0, note:'' },
+      { date:'7/1', total:1513.1, kr:1011.1, us:502.0, note:'' },
+      { date:'7/2', total:1880.3, kr:1378.3, us:502.0, note:'삼성전기 추가 익절' },
+      { date:'7/3', total:1979.7, kr:1378.3, us:601.4, note:'' },
+      { date:'7/5', total:1979.7, kr:1378.3, us:601.4, note:'' },
+      { date:'7/7', total:2152.4, kr:1551.0, us:601.4, note:'최고점' },
+      { date:'7/8', total:2098.1, kr:1551.0, us:547.1, note:'' },
     ];
-
-    const events = raw.map(d => ({
-      date: d.date,
-      total: Math.round(d.total * SCALE * 10) / 10,
-      kr:    Math.round(d.kr    * SCALE * 10) / 10,
-      us:    Math.round(d.us    * SCALE * 10) / 10,
-      note:  d.note
-    }));
 
     const last = events[events.length - 1];
     const peak = events.reduce((m, e) => e.total > m.total ? e : m, events[0]);
@@ -109,26 +149,26 @@ document.addEventListener('DOMContentLoaded', function() {
         labels: events.map(e => e.date),
         datasets: [
           {
-            label: '총 수익금',
+            label: '총 실현손익',
             data: events.map(e => e.total),
             borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,0.12)',
-            borderWidth: 3, pointRadius: 4, pointHoverRadius: 7,
+            borderWidth: 3, pointRadius: 3, pointHoverRadius: 7,
             pointBackgroundColor: '#fbbf24', pointBorderColor: '#0f1a2e', pointBorderWidth: 2,
-            fill: true, tension: 0.3, order: 3
+            fill: true, tension: 0.1, order: 3
           },
           {
             label: '🇰🇷 한국',
             data: events.map(e => e.kr),
             borderColor: '#e57373', backgroundColor: 'transparent',
-            borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
-            tension: 0.3, order: 2
+            borderWidth: 2, pointRadius: 2, pointHoverRadius: 5,
+            tension: 0.1, order: 2
           },
           {
             label: '🇺🇲 미국',
             data: events.map(e => e.us),
             borderColor: '#7cc88a', backgroundColor: 'transparent',
-            borderWidth: 2, pointRadius: 2.5, pointHoverRadius: 5,
-            tension: 0.3, order: 1
+            borderWidth: 2, pointRadius: 2, pointHoverRadius: 5,
+            tension: 0.1, order: 1
           }
         ]
       },
@@ -175,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sign = v => v >= 0 ? '+' : '';
     const col = last.total >= 0 ? '#fbbf24' : '#f87171';
     document.getElementById('returnNote').innerHTML =
-      '원금 1,000만원 기준  ·  ' +
+      '찐매매내역 실현손익  ·  ' +
       '최신 <b style="color:' + col + '">' + sign(last.total) + last.total.toFixed(0) + '만원</b>  (' + last.date + ')  ·  ' +
       '<b style="color:#e57373">🇰🇷 ' + sign(last.kr) + last.kr.toFixed(0) + '만</b>  ·  ' +
       '<b style="color:#7cc88a">🇺🇲 ' + sign(last.us) + last.us.toFixed(0) + '만</b>  ·  ' +
